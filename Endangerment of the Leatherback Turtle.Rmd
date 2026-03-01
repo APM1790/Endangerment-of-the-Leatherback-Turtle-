@@ -1,0 +1,262 @@
+---
+title: "Endangerment of Leatherback Turtle"
+author: "Akshitaa Praveen"
+date: "2025-09-08"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Abstract
+
+Animals around the world face several threats, most of which is caused by us humans and our inventions. While it is not a common topic, marine life is just as affected as animals on land. Canada is no exception. The Leatherback turtle is the largest and most migratory of all sea turtle species. It is known for its distinctive leathery shell. Once abundant in oceans worldwide, Leatherback populations have declined sharply over the past few decades. This species is now listed as vulnerable globally by the IUCN (International Union for Conservation of Nature), with some populations, like those in the Pacific, now classified as Critically Endangered.
+Human activities are the primary threats to leatherback turtles. Those include bycatch in commercial fishing gear, marine pollution, and climate change. Accidental capture in longlines and gillnets and other fishing gear, is one of the largest causes of turtle mortality. In addition, turtles ingest plastic debris, which are mistaken for jellyfish, their main prey. It leads to intestinal blockage and starvation, another big cause of death for turtles. Rising global temperatures impact sex ratios of hatchlings and the suitability of nesting habitats, all of which contribute to leatherback turtle’s declining population and high fatality rates. 
+Understanding the complex array of threats leatherback turtles face is critical to developing effective conservation strategies. This paper explores the causes behind their population decline, and discusses innovative efforts aimed at preserving this ancient and iconic marine species.
+
+\newpage
+
+# Introduction
+
+Leatherback turtles are found in warm, tropical waters, present in every ocean except for the Arctic and the Antarctic. They have thick leather carapaces and they are the only type of sea turtle that lack scales. Leatherback turtles have pointed tooth-like cusps and sharp-edged jaws, perfect for their diet of jellyfish and salps. Their front flippers are longer than other turtle species and they have paddle shaped back flippers. Leatherback turtles are excellent divers, the highest distance recorded to be around 4000ft, making them the best divers among marine animals. 
+
+They are highly migratory, swimming for an average of around 3700 miles (approximately 5954.57 km) between feeding and nesting grounds of any sea. They have the widest global distribution of all reptiles, ranging from tropical to subtropical beaches, everywhere except for the arctic and antarctic. They spend the majority of their lives in the sea except for when females have to lay their eggs. Females nest at night on tropical and subtropical beaches and dig a large body pit creating deep chambers/nests to lay their eggs. This disturbs a large part of the beach and leaves behind long circling tracks.
+
+Not all leatherback turtles follow a rigid schedule. Their migration patterns affect their nesting schedules. In the Western Pacific, summer nesting turtles (July-September) travel to the Northern hemisphere and their nesting grounds are located in temperate and tropical areas while winter nesters (November-February) travel to the Southern hemisphere and settle in tropical and temperate areas. 
+
+Turtles are said to have reached maturity at around 9-12 years, fastest among their species and their total life-span estimated to be around 45-50 years. Female leatherbacks return to their nesting grounds around every 2 to 4 years and nest several times during nesting season, laying clutches of around a hundred eggs each time. The egg incubation process lasts around two months before the hatchlings develop enough and are ready to emerge. 
+
+Recently there has been a decline in the leatherback turtle population, usually caused by human interference and activities. Their main causes include bycatch in fishing gear, plastic pollution and climate change. 
+
+\newpage
+
+# Method/Data description
+
+This study uses data from a dataset published by the Canadian government regarding information on turtle sightings in Canada between 1960 and 2024. A legend of factors were created that can be found in the dataset affecting the endangerment of the leatherback turtles. There have been 959 sightings with the dataset containing information regarding the latitude, longitude, day, month, year, local time, location name, location reliability, sp code, id reliability, minimum and maximum number of animals, platform, type of sighting and depth in meters. 
+
+
+```{r}
+Dataset <- read.csv("Data_EN (1).csv")
+glimpse(Dataset)
+```
+
+
+```{r echo=FALSE}
+library(dplyr)
+library(janitor)
+
+Dataset <- Dataset %>%
+  clean_names()
+
+glimpse(Dataset)
+
+```
+The data was loaded onto document and the glimpse feature was used to check if there were any anomalies in values. Some of the columns had N/A and missing values. NA and irrelevant values were selected using the clean function. This cleaned the dataset and was used for a statistical analysis. Columns that contained too many N/A values as well as data from before the 1960s were removed as they were outliers. The remaining values in the dataset were used to create graphs to see the impact of the different factors on the leatherback turtle species. Turtles were found in Canadian waters are recorded by the Canadian government to monitor the population of the dwindling leatherback turtles. 
+
+The leatherback turtles are a dwindling species and they are threatned by several factors caused by human activity. It is important to keep human impacts at a minimum and help restore the leatherback community. This paper is one among many that will make an impact of restoring this endangered species. This is also a paper that discusses the impacts that humans can have on not just the human population but other species that most do not consider in daily life. 
+
+
+```{r echo=FALSE}
+library(lubridate)
+
+Dataset <- Dataset %>%
+  mutate(date = make_date(year, month, day))
+```
+
+
+```{r echo=FALSE}
+colSums(is.na(Dataset))
+library(dplyr)
+
+Dataset_clean <- Dataset %>%
+  # Drop columns with too many NAs
+  select(-distance_from_obs_m, -discard_wt_kg) %>%
+  
+  # Drop rows with missing lat/long
+  filter(!is.na(latitude) & !is.na(longitude)) %>%
+  
+  # Standardize categories
+  mutate(
+    animal_condition = tolower(animal_condition),
+    platform = tolower(platform),
+    type_of_sighting = tolower(type_of_sighting),
+    # If day is missing, keep year-month only
+    date = ifelse(is.na(day), paste(year, month, "01", sep = "-"),
+                  paste(year, month, day, sep = "-")),
+    date = as.Date(date, format = "%Y-%m-%d")
+  )
+
+```
+
+
+```{r echo=FALSE}
+library(ggplot2)
+library(dplyr)
+
+# Filter and count sightings from 1960 onward
+sightings_year <- Dataset %>%
+  filter(year >= 1960) %>%
+  group_by(year) %>%
+  summarise(count = n())
+
+# Plot
+ggplot(sightings_year, aes(x = year, y = count)) +
+  geom_col(fill = "steelblue") +
+  theme_minimal() +
+  labs(
+    title = "Leatherback Turtle Sightings (1960–Present)",
+    x = "Year",
+    y = "Number of Sightings"
+  )
+
+
+
+```
+This graph shows the years in the x axis and number of sightings in the y axis. The number of sightings has increased over the years and, with the highest recorded being a little over a hundred. After that there was a decline in turtle sightings. 
+
+\newpage
+
+# Results and Analysis
+
+This part of the paper presents the results and the analysis of recorded data of turtle sightings between 1960-2020. This analysis explores patterns in turtle sightings and casualties and their connection to human interference. The following graph shows the conditions the turtles were found in be it alive, dead or unknown.\
+
+
+```{r echo=FALSE}
+library(ggplot2)
+
+
+ggplot(Dataset, aes(x = animal_condition)) +
+  geom_bar(fill = "tomato") +
+  theme_minimal() +
+  labs(
+    title = "Condition of Sighted Leatherback Turtles",
+    x = "Animal Condition",
+    y = "Number of Sightings"
+  )
+
+```
+This graph shows the turtles' conditions in the x axis and the number of sightings in the y axis. This graph shows the number of turtles alive, dead or unknown during this time. Most of the turtles were found alive but the next highest number is turtles that are dead. 
+\
+
+```{r echo=FALSE}
+
+library(dplyr)
+library(ggplot2)
+
+# Filter only dead turtles
+dead_turtles <- Dataset %>%
+  filter(tolower(animal_condition) == "dead")
+
+# Count the number of sightings by type
+dead_sightings <- dead_turtles %>%
+  group_by(type_of_sighting) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  arrange(desc(count))
+
+alive_turtles <- Dataset %>%
+  filter(tolower(animal_condition) == "alive")
+
+alive_sightings <- alive_turtles %>%
+  group_by(type_of_sighting) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  arrange(desc(count))
+
+# Plot a vertical bar graph
+ggplot(dead_sightings, aes(x = reorder(type_of_sighting, count), y = count, fill = type_of_sighting)) +
+  geom_bar(stat = "identity") +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    title = "Types of Sightings Among Dead Turtles",
+    x = "Type of Sighting",
+    y = "Number of Sightings",
+    fill = "Type of Sighting"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+\
+These results show the condition dead turtles were found in. The x axis shows the condition the turtles were found in and the y axis shows the number of sightings. According to this sighting, most of the turtles were found in entrapments thereby showing how big of a problem accidental bycatch poses. Among the 70 that were found dead, 41 were found in bycatch, which accounts for more than half the turtles found dead.\
+
+
+```{r echo=FALSE}
+
+library(ggplot2)
+
+ggplot(alive_sightings, aes(x = reorder(type_of_sighting, count), 
+                            y = count, 
+                            fill = type_of_sighting)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Types of Sightings Among Alive Turtles",
+    x = "Type of Sighting",
+    y = "Number of Sightings",
+    fill = "Type of Sighting"
+  ) +
+  theme_minimal()
+
+
+```
+
+\
+Among the turtles found alive, 90 of the turtles were found trapped.
+
+The results indicate that bycatch is one of the leading contributors to leatherback turtle injury and mortality rates in Canada. Bycatch was one of the top two conditions in which leatherback turtles were found, whether alive or deceased (NOAA Fisheries, 2025; SEE Turtles, n.d.).
+
+Bycatch is especially deadly for leatherback turtles because they become entangled in fishing nets and gear designed for fish. Turtles caught underwater are unable to surface to breathe and may drown. In most cases, by the time fishers become aware of the entanglement, it is already too late. Even if they survive, they often suffer severe injuries while trying to escape, which can later lead to death. This pattern demonstrates the serious threat that fishing gear entanglement poses to leatherback turtles (Lewison et al., 2014; SEE Turtles, n.d.).
+
+Another leading cause of death for leatherback turtles is the ingestion of plastic and other harmful human waste discarded into the ocean. Leatherback turtles primarily eat invertebrates such as jellyfish and sea squirts. Although they are immune to jellyfish venom, they cannot distinguish between jellyfish and floating plastic bags (WWF Australia, n.d.; World Wildlife Fund, 2025).
+
+Young hatchlings are especially vulnerable. Mothers lay their eggs on beaches, many of which are contaminated with microplastics. When hatchlings emerge and crawl toward the ocean, they may accidentally ingest plastic, mistaking it for food (Turtle Island Restoration Network, 2011). Research shows that leatherbacks face nearly a 50% chance of death after ingesting 14 pieces of plastic, and even ingesting a single piece can result in a 22% chance of mortality (Schuyler et al., 2013). Plastic ingestion can also cause intestinal blockages, internal injuries, and long-term reproductive issues, further threatening population survival (Mrosovsky et al., 2009; Schuyler et al., 2013).
+
+Climate change is another significant threat to leatherback turtle populations. The sex ratio of hatchlings is temperature-dependent, meaning warmer sand temperatures produce more females. Rising global temperatures are altering the male-to-female ratio, leading to fewer male hatchlings in recent years (Florida Atlantic University, n.d.). Additionally, hotter and drier nesting conditions reduce egg survival rates, as eggs incubated on cooler beaches are more likely to survive (Drexel University, 2023). Rising sea levels and coastal erosion further threaten nests by washing away eggs. Climate models predict that nesting populations could decline by up to 75% by the year 2100 if current trends continue (Drexel University, 2023).
+\newpage
+
+# Conclusion
+
+To conclude, leatherback turtles are an endangered species facing major threats from human activities, including bycatch, plastic pollution, and climate change (NOAA Fisheries, 2025). Turtles caught in bycatch experience high mortality rates due to unintentional capture in fishing gear (Lewison et al., 2014). Even when they survive, injuries sustained during entanglement can be fatal later.
+
+Plastic pollution is another major factor contributing to leatherback endangerment. Leatherbacks mistake plastic for jellyfish and accidentally consume it, which can cause death or severe health complications (Schuyler et al., 2013; WWF Australia, n.d.). Hatchlings are especially vulnerable due to plastic-contaminated nesting beaches (Turtle Island Restoration Network, 2011).
+
+Climate change further impacts leatherback turtles by altering hatchling sex ratios and increasing egg mortality due to rising temperatures and beach erosion (Drexel University, 2023; Florida Atlantic University, n.d.). These combined threats significantly reduce reproduction and survival rates, placing the species at continued risk.
+
+Some steps we can take include developing innovative methods to reduce bycatch, such as modifying fishing gear, organizing beach clean-up initiatives to reduce plastic pollution, and raising awareness about climate change and its impacts. If we take collective action toward conservation and species recovery, we may one day see leatherback turtles thrive in our oceans without the constant threat of extinction. 
+
+
+\newpage
+# Citations 
+Fisheries bycatch — SEE turtles. (n.d.-a). SEE Turtles. https://www.seeturtles.org/fisheries-bycatch?gad_source=1&gad_campaignid=23206395078&gbraid=0AAAAAD0I-XRFUwXQ34KMgzcRxxfRCF0JW&gclid=CjwKCAiA9aPKBhBhEiwAyz82J3mOg0nLHtk2eNFvCWcRnDGHUq2_qm0l_Lzfy5tRUOfj2Oz95Z0skhoCL4QQAvD_BwE
+
+Fisheries bycatch — SEE turtles. (n.d.-b). SEE Turtles. https://www.seeturtles.org/fisheries-bycatch?gad_source=1&gad_campaignid=23206395078&gbraid=0AAAAAD0I-XRFUwXQ34KMgzcRxxfRCF0JW&gclid=CjwKCAiA9aPKBhBhEiwAyz82J3mOg0nLHtk2eNFvCWcRnDGHUq2_qm0l_Lzfy5tRUOfj2Oz95Z0skhoCL4QQAvD_BwE
+
+Fisheries, N. (2025, January 8). Leatherback turtle. NOAA. https://www.fisheries.noaa.gov/species/leatherback-turtle
+
+Leatherback Sea Turtles — Upwell. (n.d.). Upwell. https://www.upwell.org/leatherback?gad_source=1&gad_campaignid=16506216420&gbraid=0AAAAAC-3OzOuBaaKIFP_Ui6uIjMlxSRd2&gclid=CjwKCAjwk7DFBhBAEiwAeYbJsfj4k7dcnYJkAOoeO9syxUrpKkqHdiIq-QSff5yd6IKH4L8N0bp9SxoCci4QAvD_BwE
+
+Lewison, R. L., Crowder, L. B., Wallace, B. P., Moore, J. E., Cox, T., Zydelis, R., McDonald, S., DiMatteo, A., Dunn, D. C., Kot, C. Y., Bjorkland, R., Kelez, S., Soykan, C., Stewart, K. R., Sims, M., Boustany, A., Read, A. J., Halpin, P., Nichols, W. J., & Safina, C. (2014a). Global patterns of marine mammal, seabird, and sea turtle bycatch reveal taxa-specific and cumulative megafauna hotspots. Proceedings of the National Academy of Sciences, 111(14), 5271–5276. https://doi.org/10.1073/pnas.1318960111
+
+Lewison, R. L., Crowder, L. B., Wallace, B. P., Moore, J. E., Cox, T., Zydelis, R., McDonald, S., DiMatteo, A., Dunn, D. C., Kot, C. Y., Bjorkland, R., Kelez, S., Soykan, C., Stewart, K. R., Sims, M., Boustany, A., Read, A. J., Halpin, P., Nichols, W. J., & Safina, C. (2014b). Global patterns of marine mammal, seabird, and sea turtle bycatch reveal taxa-specific and cumulative megafauna hotspots. Proceedings of the National Academy of Sciences, 111(14), 5271–5276. https://doi.org/10.1073/pnas.1318960111
+
+Mrosovsky, N., Ryan, G. D., & James, M. C. (2009). Leatherback turtles: The menace of plastic. Marine Pollution Bulletin, 58(2), 287–289. https://doi.org/10.1016/j.marpolbul.2008.10.018 
+Plastic pollution is killing sea turtles: Here’s how – WWF-Australia | Plastic pollution is killing sea turtles: Here’s how | WWF Australia. (n.d.). WWF Australia.
+
+https://wwf.org.au/blogs/plastic-pollution-is-killing-sea-turtles-heres-how/  
+Proceedings of the National Academy of Sciences. (n.d.). PNAS.      https://www.pnas.org/?skip=true
+Rising heat at the beach threatens leatherback turtles. (2023, January 23). 
+
+https://drexel.edu/news/archive/2012/July/Climate-Change-Threatens-Leatherback-Sea-Turtles/#:~:text=Research%20Science%20&%20Technology-,Rising%20Heat%20at%20the%20Beach%20Threatens,Turtles%2C%20Climate%20Change%20Models%20Show&text=A%20leatherback%20sea%20turtle%20hatchling,percent%20by%20the%20year%202100. 
+
+Schuyler, Q., Hardesty, B. D., Wilcox, C., & Townsend, K. (2013a). Global Analysis of Anthropogenic Debris Ingestion by Sea Turtles. Conservation Biology, 28(1), 129–139. https://doi.org/10.1111/cobi.12126 
+
+Schuyler, Q., Hardesty, B. D., Wilcox, C., & Townsend, K. (2013b). Global Analysis of Anthropogenic Debris Ingestion by Sea Turtles. Conservation Biology, 28(1), 129–139. https://doi.org/10.1111/cobi.12126 
+
+Tirnadmin. (2011, February 8). Plastic: another enemy to the Leatherback Sea Turtle. Turtle Island Restoration Network. https://seaturtles.org/plastic-another-enemy-to-the-leatherback-sea-turtle/#:~:text=Leatherbacks%2C%20which%20feed%20primarily%20on,His%20blog%20rocks%20too. 
+
+Tracking turtles. (n.d.). Florida Atlantic University. https://www.fau.edu/research/research-daily/2024/tracking-turtles-sis/#:~:text=Green%20Turtles:%20Female%2088%25%20vs,themselves%20and%20had%20shorter%20flippers 
+
+What do sea turtles eat? Unfortunately, plastic bags. (2025). World Wildlife Fund. https://www.worldwildlife.org/resources/explainers/what-do-sea-turtles-eat-unfortunately-plastic-bags/
+
+
